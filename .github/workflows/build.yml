@@ -39,6 +39,10 @@ jobs:
       - name: Generate Android platform files
         run: flutter create . --platforms=android
 
+      - name: Update NDK version
+        run: |
+          sed -i 's/ndkVersion = flutter.ndkVersion/ndkVersion = "27.0.12077973"/' android/app/build.gradle.kts
+
       - name: Get Flutter dependencies
         run: flutter pub get
 

@@ -70,7 +70,7 @@ class _WorldElementEditorViewState extends State<WorldElementEditorView> {
       widget.element!.tags = _tags;
       widget.element!.customFields = _customFields;
       widget.element!.lastModified = DateTime.now();
-      _viewModel.updateWorldElement(widget.element!);
+      _viewModel.updateElement(widget.element!);
     }
 
     Navigator.pop(context);
