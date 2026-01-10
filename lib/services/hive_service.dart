@@ -7,6 +7,8 @@ import 'package:noteleaf/models/project.dart';
 import 'package:noteleaf/models/theme.dart';
 import 'package:noteleaf/models/writing_goal.dart';
 import 'package:noteleaf/models/version_snapshot.dart';
+import 'package:noteleaf/models/scene.dart';
+import 'package:noteleaf/models/world_element.dart';
 
 class HiveService {
   static Future<void> initHive() async {
@@ -19,6 +21,8 @@ class HiveService {
     Hive.registerAdapter(NoteAdapter());
     Hive.registerAdapter(WritingGoalAdapter());
     Hive.registerAdapter(VersionSnapshotAdapter());
+    Hive.registerAdapter(SceneAdapter());
+    Hive.registerAdapter(WorldElementAdapter());
   }
 
   Future<Box<Project>> get projectBox async =>
@@ -34,5 +38,9 @@ class HiveService {
       await Hive.openBox<WritingGoal>('writing_goals');
   Future<Box<VersionSnapshot>> get versionSnapshotBox async =>
       await Hive.openBox<VersionSnapshot>('version_snapshots');
+  Future<Box<Scene>> get sceneBox async =>
+      await Hive.openBox<Scene>('scenes');
+  Future<Box<WorldElement>> get worldElementBox async =>
+      await Hive.openBox<WorldElement>('world_elements');
 }
 

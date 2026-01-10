@@ -1,9 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:noteleaf/viewmodels/theme_viewmodel.dart' as theme_vm;
 
-class SettingsView extends StatelessWidget {
+class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
+
+  @override
+  State<SettingsView> createState() => _SettingsViewState();
+}
+
+class _SettingsViewState extends State<SettingsView> {
+  bool _showInspirationalQuotes = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _showInspirationalQuotes = prefs.getBool('show_inspirational_quotes') ?? true;
+    });
+  }
+
+  Future<void> _toggleInspirationalQuotes(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('show_inspirational_quotes', value);
+    setState(() {
+      _showInspirationalQuotes = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +91,29 @@ class SettingsView extends StatelessWidget {
                         ],
                       );
                     },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Preferences',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 16),
+                  SwitchListTile(
+                    title: const Text('Show Inspirational Quotes'),
+                    subtitle: const Text('Display writing quotes on app startup'),
+                    value: _showInspirationalQuotes,
+                    onChanged: _toggleInspirationalQuotes,
+                    contentPadding: EdgeInsets.zero,
                   ),
                 ],
               ),

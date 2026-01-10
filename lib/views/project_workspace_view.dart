@@ -5,6 +5,7 @@ import 'package:noteleaf/views/characters_tab.dart';
 import 'package:noteleaf/views/plot_tab.dart';
 import 'package:noteleaf/views/themes_tab.dart';
 import 'package:noteleaf/views/notes_tab.dart';
+import 'package:noteleaf/views/world_building_tab.dart';
 import 'package:noteleaf/views/export_dialog.dart';
 import 'package:noteleaf/models/project.dart';
 import 'package:noteleaf/viewmodels/chapter_viewmodel.dart';
@@ -49,7 +50,7 @@ class _ProjectWorkspaceViewState extends State<ProjectWorkspaceView> {
           ],
         ),
         body: DefaultTabController(
-          length: 5,
+          length: 6,
           child: Column(
             children: [
               const TabBar(
@@ -60,6 +61,7 @@ class _ProjectWorkspaceViewState extends State<ProjectWorkspaceView> {
                   Tab(icon: Icon(Icons.timeline), text: 'Plot'),
                   Tab(icon: Icon(Icons.palette), text: 'Themes'),
                   Tab(icon: Icon(Icons.note), text: 'Notes'),
+                  Tab(icon: Icon(Icons.public), text: 'World'),
                 ],
               ),
               Expanded(
@@ -70,6 +72,7 @@ class _ProjectWorkspaceViewState extends State<ProjectWorkspaceView> {
                     PlotTab(projectId: widget.projectId),
                     ThemesTab(projectId: widget.projectId),
                     NotesTab(projectId: widget.projectId),
+                    WorldBuildingTab(projectId: widget.projectId),
                   ],
                 ),
               ),

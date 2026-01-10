@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:noteleaf/viewmodels/project_viewmodel.dart';
 import 'package:noteleaf/viewmodels/theme_viewmodel.dart';
 import 'package:noteleaf/views/project_workspace_view.dart';
@@ -33,13 +34,22 @@ class _HomeViewState extends State<HomeView> {
     super.initState();
     _projectViewModel = ProjectViewModel();
     _projectViewModel.loadProjects();
-    
-    // Show inspirational quote on startup
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_showQuote) {
-        _showInspirationalQuote();
-      }
+    _loadQuotePreference();
+  }
+
+  Future<void> _loadQuotePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    final showQuote = prefs.getBool('show_inspirational_quotes') ?? true;
+    setState(() {
+      _showQuote = showQuote;
     });
+    
+    // Show inspirational quote on startup if enabled
+    if (_showQuote) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showInspirationalQuote();
+      });
+    }
   }
 
   void _showInspirationalQuote() {
@@ -57,7 +67,9 @@ class _HomeViewState extends State<HomeView> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('show_inspirational_quotes', false);
               setState(() {
                 _showQuote = false;
               });

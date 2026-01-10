@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:noteleaf/viewmodels/chapter_viewmodel.dart';
 import 'package:noteleaf/views/chapter_editor_view.dart';
+import 'package:noteleaf/views/scene_management_view.dart';
 
 class ChaptersTab extends StatefulWidget {
   final String projectId;
@@ -110,6 +111,16 @@ class _ChaptersTabState extends State<ChaptersTab> {
                         PopupMenuButton(
                           itemBuilder: (context) => [
                             const PopupMenuItem(
+                              value: 'scenes',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.movie),
+                                  SizedBox(width: 8),
+                                  Text('Manage Scenes'),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
                               value: 'delete',
                               child: Row(
                                 children: [
@@ -121,7 +132,17 @@ class _ChaptersTabState extends State<ChaptersTab> {
                             ),
                           ],
                           onSelected: (value) {
-                            if (value == 'delete') {
+                            if (value == 'scenes') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SceneManagementView(
+                                    chapterId: chapter.id,
+                                    chapterTitle: chapter.title,
+                                  ),
+                                ),
+                              );
+                            } else if (value == 'delete') {
                               _showDeleteDialog(context, chapter.id, chapter.title);
                             }
                           },

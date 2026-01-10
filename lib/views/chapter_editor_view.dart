@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:noteleaf/models/chapter.dart';
 import 'package:noteleaf/viewmodels/chapter_viewmodel.dart';
 import 'package:noteleaf/views/distraction_free_editor_view.dart';
+import 'package:noteleaf/views/version_history_view.dart';
 import 'package:noteleaf/widgets/readability_stats_widget.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -78,6 +79,25 @@ class _ChapterEditorViewState extends State<ChapterEditorView> {
     );
   }
 
+  void _openVersionHistory() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VersionHistoryView(
+          entityId: widget.chapter.id,
+          entityType: 'chapter',
+          onRestoreVersion: (content) {
+            setState(() {
+              _contentController.text = content;
+              widget.chapter.content = content;
+              _chapterViewModel.updateChapter(widget.chapter);
+            });
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
@@ -113,6 +133,11 @@ class _ChapterEditorViewState extends State<ChapterEditorView> {
                 });
               },
               tooltip: 'Readability Statistics',
+            ),
+            IconButton(
+              icon: const Icon(Icons.history),
+              onPressed: _openVersionHistory,
+              tooltip: 'Version History',
             ),
             IconButton(
               icon: const Icon(Icons.fullscreen),
