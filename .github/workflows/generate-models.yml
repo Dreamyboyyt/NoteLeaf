@@ -1,0 +1,52 @@
+name: Generate Model Files
+
+on:
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: '3.32.3'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Generate model files
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Create zip of generated files
+        run: |
+          mkdir -p generated_output
+          cp lib/models/*.g.dart generated_output/ 2>/dev/null || true
+          zip -r generated-models.zip generated_output lib/models/*.g.dart
+
+      - name: Upload generated files
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-model-files
+          path: generated-models.zip
+          retention-days: 7
+
+      - name: Create complete project zip
+        run: |
+          zip -r complete-project.zip . -x "*.git*" -x "*build/*" -x "*.dart_tool/*"
+
+      - name: Upload complete project
+        uses: actions/upload-artifact@v4
+        with:
+          name: complete-project-with-generated-files
+          path: complete-project.zip
+          retention-days: 7
