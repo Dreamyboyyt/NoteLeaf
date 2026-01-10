@@ -164,13 +164,17 @@ class _ChapterEditorViewState extends State<ChapterEditorView> {
                   ),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildCountChip('Words', _wordCount, Icons.article),
-                  _buildCountChip('Characters', _characterCount, Icons.text_fields),
-                  _buildCountChip('No Spaces', _characterCountNoSpaces, Icons.space_bar_outlined),
-                ],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildCountChip('Words', _wordCount, Icons.article),
+                    const SizedBox(width: 8),
+                    _buildCountChip('Chars', _characterCount, Icons.text_fields),
+                    const SizedBox(width: 8),
+                    _buildCountChip('No Space', _characterCountNoSpaces, Icons.space_bar_outlined),
+                  ],
+                ),
               ),
             ),
             if (_showReadabilityStats)
