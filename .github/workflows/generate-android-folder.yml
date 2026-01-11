@@ -1,0 +1,201 @@
+name: Generate Android Folder
+
+on:
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: '3.32.3'
+
+jobs:
+  generate-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Generate Android platform files
+        run: flutter create . --platforms=android --org=com.sleepy --project-name=noteleaf
+
+      - name: Update Android configuration
+        run: |
+          # Update NDK version
+          sed -i 's/ndkVersion = flutter.ndkVersion/ndkVersion = "27.0.12077973"/' android/app/build.gradle.kts
+          
+          # Update app name in AndroidManifest.xml
+          sed -i 's/android:label="noteleaf"/android:label="NoteLeaf"/' android/app/src/main/AndroidManifest.xml
+          
+          # Verify changes
+          echo "=== build.gradle.kts NDK version ==="
+          grep "ndkVersion" android/app/build.gradle.kts
+          
+          echo "=== AndroidManifest.xml app label ==="
+          grep "android:label" android/app/src/main/AndroidManifest.xml
+
+      - name: Create MainActivity with correct package
+        run: |
+          # Create the correct package directory
+          mkdir -p android/app/src/main/kotlin/com/sleepy/noteleaf
+          
+          # Create MainActivity.kt
+          cat > android/app/src/main/kotlin/com/sleepy/noteleaf/MainActivity.kt << 'EOF'
+          package com.sleepy.noteleaf
+
+          import io.flutter.embedding.android.FlutterActivity
+
+          class MainActivity : FlutterActivity()
+          EOF
+          
+          # Remove default generated MainActivity if it exists
+          rm -f android/app/src/main/kotlin/com/example/noteleaf/MainActivity.kt
+          rm -rf android/app/src/main/kotlin/com/example
+          
+          echo "=== MainActivity.kt created ==="
+          cat android/app/src/main/kotlin/com/sleepy/noteleaf/MainActivity.kt
+
+      - name: Verify Android folder structure
+        run: |
+          echo "=== Android folder structure ==="
+          ls -la android/
+          ls -la android/app/
+          ls -la android/app/src/main/kotlin/com/sleepy/noteleaf/
+
+      - name: Create zip of Android folder
+        run: |
+          zip -r android-folder.zip android/
+
+      - name: Upload Android folder artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-folder-noteleaf
+          path: android-folder.zip
+          retention-days: 7
+
+      - name: Create instructions file
+        run: |
+          cat > ANDROID_FOLDER_INSTRUCTIONS.md << 'EOF'
+          # Android Folder - NoteLeaf
+
+          ## What's Included
+          This artifact contains a properly configured Android folder for NoteLeaf with:
+
+          ✅ App Name: "NoteLeaf" (display name)
+          ✅ Package Name: com.sleepy.noteleaf
+          ✅ NDK Version: 27.0.12077973
+          ✅ MainActivity: Correct package location
+          ✅ Namespace: com.sleepy.noteleaf
+
+          ## How to Use
+
+          1. Download and extract `android-folder.zip`
+          2. Copy the `android` folder to your project root:
+             ```bash
+             unzip android-folder-noteleaf.zip
+             cp -r android /path/to/your/project/
+             ```
+          3. Verify the configuration:
+             ```bash
+             # Check app name
+             grep "android:label" android/app/src/main/AndroidManifest.xml
+             
+             # Check package name
+             grep "namespace" android/app/build.gradle.kts
+             grep "applicationId" android/app/build.gradle.kts
+             
+             # Check NDK version
+             grep "ndkVersion" android/app/build.gradle.kts
+             ```
+
+          ## Configuration Details
+
+          ### App Name
+          - Display Name: **NoteLeaf**
+          - Package Name: **noteleaf** (lowercase for technical naming)
+          - Location: `android/app/src/main/AndroidManifest.xml`
+
+          ### Package Structure
+          ```
+          android/app/src/main/kotlin/com/sleepy/noteleaf/MainActivity.kt
+          ```
+
+          ### Build Configuration
+          - Namespace: `com.sleepy.noteleaf`
+          - Application ID: `com.sleepy.noteleaf`
+          - NDK Version: `27.0.12077973`
+          - Min SDK: 21
+          - Target SDK: 35 (auto-set by Flutter)
+          - Compile SDK: 35 (auto-set by Flutter)
+
+          ## Next Steps
+
+          After copying the android folder:
+
+          1. **Remove from .gitignore** (optional):
+             If you want to commit the android folder, remove `/android/` from `.gitignore`
+
+          2. **Build the app**:
+             ```bash
+             flutter clean
+             flutter pub get
+             flutter build apk --release
+             ```
+
+          3. **Test on device**:
+             ```bash
+             flutter run --release
+             ```
+
+          ## Troubleshooting
+
+          ### Issue: Package name mismatch
+          **Solution**: Ensure MainActivity package matches namespace in build.gradle.kts
+
+          ### Issue: Build fails with NDK error
+          **Solution**: NDK 27.0.12077973 is already set in build.gradle.kts
+
+          ### Issue: Wrong app name shows
+          **Solution**: Check android:label in AndroidManifest.xml
+
+          ## Notes
+
+          - The android folder is now configured for permanent use
+          - You can commit it to git or regenerate as needed
+          - The app name "NoteLeaf" will show properly on the device
+          - Package name remains "com.sleepy.noteleaf" for technical reasons
+
+          ---
+
+          Generated by GitHub Actions
+          Flutter Version: 3.32.3
+          EOF
+
+          cat ANDROID_FOLDER_INSTRUCTIONS.md
+
+      - name: Upload instructions
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-folder-instructions
+          path: ANDROID_FOLDER_INSTRUCTIONS.md
+          retention-days: 7
+
+      - name: Summary
+        run: |
+          echo "✅ Android folder generated successfully!"
+          echo ""
+          echo "📦 Artifacts created:"
+          echo "  1. android-folder-noteleaf.zip - Complete Android folder"
+          echo "  2. ANDROID_FOLDER_INSTRUCTIONS.md - Setup instructions"
+          echo ""
+          echo "🎯 Configuration:"
+          echo "  - App Name: NoteLeaf"
+          echo "  - Package: com.sleepy.noteleaf"
+          echo "  - NDK: 27.0.12077973"
+          echo ""
+          echo "📥 Download artifacts and extract to your project!"
