@@ -76,11 +76,11 @@ flutter run --release
 ## What Gets Configured
 
 ✅ **App Display Name**: NoteLeaf (shows on device home screen)
-✅ **Package Name**: com.sleepy.noteleaf
+✅ **Package Name**: com.sleepy.noteleaf (auto-set by --org flag)
 ✅ **Namespace**: com.sleepy.noteleaf
 ✅ **Application ID**: com.sleepy.noteleaf
 ✅ **NDK Version**: 27.0.12077973 (compatible with all plugins)
-✅ **MainActivity**: Located at `com/sleepy/noteleaf/MainActivity.kt`
+✅ **MainActivity**: Auto-generated at `com/sleepy/noteleaf/MainActivity.kt`
 
 ## File Structure
 
